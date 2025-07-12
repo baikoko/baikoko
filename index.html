@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bokomu</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 auto;
+      max-width: 480px; /* Constrain to fit smaller devices */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional aesthetic */
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      background-color: #ffd736;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .logo span {
+      color: black; /* Default letter color */
+    }
+
+    .logo .o {
+      color: white; /* White for the "o" letters */
+      animation: jump 5s infinite;
+    }
+
+    .logo .o:nth-child(2) {
+      animation-delay: 0s; /* First "o" starts immediately */
+    }
+
+    .logo .o:nth-child(4) {
+      animation-delay: 2.5s; /* Second "o" starts 2.5 seconds later */
+    }
+
+    /* Animation for the jumping "o" letters */
+    @keyframes jump {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px); /* Moves the "o" up */
+      }
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      margin-left: 10px;
+    }
+
+    .search-bar {
+      padding: 10px;
+      padding-right: 40px; /* Add space for the icon */
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/622/622669.png');
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 20px 20px;
+    }
+
+    .content {
+      padding: 15px;
+      width: 100%;
+    }
+
+    .movie-card {
+      background-color: white;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s ease;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.02);
+    }
+
+    .movie-image {
+      width: 100%;
+      height: auto;
+    }
+
+    .movie-details {
+      padding: 10px;
+    }
+
+    .movie-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .movie-info {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .search-result {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .not-found {
+      color: red;
+      font-size: 20px;
+      margin: 30px 0;
+      font-size: 20px;
+    }
+
+    .request-box {
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fad02c;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-size: 30px;
+      color: black;
+      display: inline-block;
+    }
+
+    .request-box a {
+      text-decoration: none;
+      color: black;
+    }
+
+    .request-box a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo">
+      B<span class="o">o</span>k<span class="o">o</span>mu
+    </div>
+    <div class="search-container">
+      <input type="text" class="search-bar" placeholder="Search movies, shows, etc." id="searchInput" />
+    </div>
+  </header>
+
+  <div class="content" id="content">
+    <!-- Movie cards dynamically inserted here -->
+  </div>
+
+  <div class="search-result" id="searchResult"></div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const content = document.getElementById('content');
+    const searchResult = document.getElementById('searchResult');
+
+    // Mock movie database
+    const movies = [
+      {
+        link: 'https://www.example.com/movie1',
+        title: 'Sample Movie 1',
+        image: 'https://kuzaumaarufu.online/images/kombolela1.png',
+        info: 'Release Date: 2025 | Genre: Action',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://kuzaumaarufu.online/images/kombolela1.png',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie2',
+        title: 'Sample Movie 2',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2024 | Genre: Drama',
+      },
+      {
+        link: 'https://www.example.com/movie3',
+        title: 'Action Packed Adventure',
+        image: 'https://via.placeholder.com/400x300',
+        info: 'Release Date: 2023 | Genre: Action',
+      },
+    ];
+
+    // Function to display movie cards
+    const displayMovies = (movieList) => {
+      content.innerHTML = '';
+      movieList.forEach((movie) => {
+        const movieCard = `
+          <a href="${movie.link}" class="movie-card" target="_blank">
+            <img src="${movie.image}" alt="${movie.title}" class="movie-image" />
+            <div class="movie-details">
+              <div class="movie-title">${movie.title}</div>
+              <div class="movie-info">${movie.info}</div>
+            </div>
+          </a>
+        `;
+        content.innerHTML += movieCard;
+      });
+    };
+
+    // Display all movies initially
+    displayMovies(movies);
+
+    // Handle search input
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      searchResult.innerHTML = ''; // Clear previous results
+
+      const filteredMovies = movies.filter((movie) =>
+        movie.title.toLowerCase().includes(query)
+      );
+
+      if (filteredMovies.length > 0) {
+        displayMovies(filteredMovies);
+      } else if (query) {
+        searchResult.innerHTML = `
+          <div class="not-found">${query} - Not Available</div>
+          <div class="request-box"><a href="go:A12">Request this movie</a></div>
+        `;
+        content.innerHTML = ''; // Clear movie cards if no match is found
+      }
+    });
+  </script>
+</body>
+</html>
